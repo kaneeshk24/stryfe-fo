@@ -4,15 +4,12 @@ import Webcam from "react-webcam";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
 
-const WIDTH = 640;
-const HEIGHT = 360;
-
-interface Coordinate {
-  x: number;
-  y: number;
+interface HandTrackingProps {
+  width: number;
+  height: number;
 }
 
-export default function Video() {
+export default function Video({ width, height }: HandTrackingProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [recognizer, setRecognizer] = useState<GestureRecognizer>();
@@ -49,8 +46,8 @@ export default function Video() {
       if (!webcamRef.current?.video || !isStarted) return;
 
       const video = webcamRef.current.video;
-      ctx.clearRect(0, 0, WIDTH, HEIGHT);
-      ctx.drawImage(video, 0, 0, WIDTH, HEIGHT);
+      ctx.clearRect(0, 0, width, height);
+      ctx.drawImage(video, 0, 0, width, height);
 
       const startTimeMs = performance.now();
       const results = recognizer.recognizeForVideo(video, startTimeMs);
@@ -90,14 +87,14 @@ export default function Video() {
       <Webcam
         ref={webcamRef}
         audio={false}
-        width={WIDTH}
-        height={HEIGHT}
+        width={width}
+        height={height}
         className="hidden"
       />
       <canvas
         ref={canvasRef}
-        width={WIDTH}
-        height={HEIGHT}
+        width={width}
+        height={height}
         className="rounded-lg shadow-lg"
       />
       {!isStarted && (

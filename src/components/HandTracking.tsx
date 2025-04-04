@@ -3,18 +3,20 @@ import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import { drawConnectors, drawLandmarks } from "@mediapipe/drawing_utils";
 import { HAND_CONNECTIONS } from "@mediapipe/hands";
+import Stopwatch from "./Stopwatch";
 
 interface HandTrackingProps {
   width: number;
   height: number;
 }
 
-export default function Video({ width, height }: HandTrackingProps) {
+export default function HandTracking({ width, height }: HandTrackingProps) {
   const webcamRef = useRef<Webcam>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [recognizer, setRecognizer] = useState<GestureRecognizer>();
   const [result, setResult] = useState<string>("");
   const [isStarted, setIsStarted] = useState<boolean>(false);
+  const [stopwatchActive, setStopwatchActive] = useState<boolean>(false);
 
   useEffect(() => {
     const initializeRecognizer = async () => {
@@ -67,7 +69,18 @@ export default function Video({ width, height }: HandTrackingProps) {
       }
 
       if (results.gestures.length > 0) {
-        setResult(results.gestures[0][0].categoryName);
+        const gesture = results.gestures[0][0].categoryName;
+        setResult(gesture);
+        
+        // Start stopwatch when Pointing_Up is detected
+        if (gesture === "Pointing_Up" && !stopwatchActive) {
+          setStopwatchActive(true);
+        }
+        
+        // Stop stopwatch when Open_Palm is detected
+        if (gesture === "Open_Palm" && stopwatchActive) {
+          setStopwatchActive(false);
+        }
       } else {
         setResult("");
       }
@@ -76,11 +89,7 @@ export default function Video({ width, height }: HandTrackingProps) {
     };
 
     processFrame();
-  }, [recognizer, isStarted]);
-
-  const startTracking = () => {
-    setIsStarted(true);
-  };
+  }, [recognizer, isStarted, width, height, stopwatchActive]);
 
   return (
     <div className="relative">
@@ -99,7 +108,7 @@ export default function Video({ width, height }: HandTrackingProps) {
       />
       {!isStarted && (
         <button
-          onClick={startTracking}
+          onClick={() => setIsStarted(true)}
           className="absolute top-4 left-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
         >
           Start Tracking
@@ -109,6 +118,13 @@ export default function Video({ width, height }: HandTrackingProps) {
         <div className="absolute top-4 left-4 bg-black bg-opacity-50 text-white px-4 py-2 rounded-lg">
           {result ? `Detected Gesture: ${result}` : 'No gesture detected'}
         </div>
+      )}
+      
+      {isStarted && (
+        <Stopwatch 
+          isGestureActive={stopwatchActive} 
+          gestureName={result} 
+        />
       )}
     </div>
   );

@@ -1,4 +1,3 @@
-import React from 'react';
 import HandTracking from './components/HandTracking';
 import './App.css';
 
@@ -15,6 +14,7 @@ function App() {
         <div className="mt-8 text-center text-gray-600">
           <p>Show your hands to the camera to see the tracking in action!</p>
           <p className="mt-2 text-sm">The green lines show hand connections, while red dots indicate landmarks.</p>
+          <p className="mt-2 text-sm">Show a "Pointing_Up" gesture to start the stopwatch.</p>
         </div>
       </div>
     </div>

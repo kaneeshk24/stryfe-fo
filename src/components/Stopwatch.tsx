@@ -30,7 +30,7 @@ export default function Stopwatch({ isGestureActive, gestureName }: StopwatchPro
       startedByGestureRef.current = true;
       countdownStartedByGestureRef.current = true;
       startCountdown();
-    } else if (!isGestureActive || gestureName === "Open_Palm") {
+    } else if (!isGestureActive && gestureName === "Open_Palm") {
       if (isStopwatchRunning && startedByGestureRef.current) {
         stopStopwatch();
       }

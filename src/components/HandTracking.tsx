@@ -17,6 +17,7 @@ export default function HandTracking({ width, height }: HandTrackingProps) {
   const [result, setResult] = useState<string>("");
   const [isStarted, setIsStarted] = useState<boolean>(false);
   const [stopwatchActive, setStopwatchActive] = useState<boolean>(false);
+  const lastGestureRef = useRef<string>("");
 
   useEffect(() => {
     const initializeRecognizer = async () => {
@@ -72,17 +73,23 @@ export default function HandTracking({ width, height }: HandTrackingProps) {
         const gesture = results.gestures[0][0].categoryName;
         setResult(gesture);
         
-        // Start stopwatch when Pointing_Up is detected
-        if (gesture === "Pointing_Up" && !stopwatchActive) {
-          setStopwatchActive(true);
-        }
-        
-        // Stop stopwatch when Open_Palm is detected
-        if (gesture === "Open_Palm" && stopwatchActive) {
-          setStopwatchActive(false);
+        // Only update stopwatchActive if the gesture has changed
+        if (gesture !== lastGestureRef.current) {
+          lastGestureRef.current = gesture;
+          
+          if (gesture === "Pointing_Up") {
+            setStopwatchActive(true);
+          } else if (gesture === "Open_Palm") {
+            setStopwatchActive(false);
+          }
         }
       } else {
         setResult("");
+        // Reset stopwatch when no gesture is detected
+        if (stopwatchActive) {
+          setStopwatchActive(false);
+        }
+        lastGestureRef.current = "";
       }
 
       requestAnimationFrame(processFrame);
